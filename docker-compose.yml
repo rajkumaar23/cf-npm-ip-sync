@@ -1,0 +1,10 @@
+services:
+  cf-npm-ip-sync:
+    image: ghcr.io/rajkumaar23/cf-npm-ip-sync:main
+    restart: always
+    environment:
+      - NPM_HOST=
+      - NPM_EMAIL=
+      - NPM_PASSWORD=
+      - NPM_ACCESS_LIST_ID=
+      - SYNC_INTERVAL="1h" # only valid Go time.Duration values are allowed
