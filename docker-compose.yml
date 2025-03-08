@@ -1,5 +1,5 @@
 services:
-  cf-npm-ip-sync:
+  app:
     image: ghcr.io/rajkumaar23/cf-npm-ip-sync:main
     restart: always
     environment:
