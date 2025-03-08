@@ -1,7 +1,7 @@
 package main
 
 import (
-	"cf-npm-ip-sync/internal"
+	"cloudflare-npm-ip-sync/internal"
 	"context"
 	"log"
 	"time"

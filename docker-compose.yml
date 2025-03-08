@@ -1,10 +1,19 @@
 services:
   app:
-    image: ghcr.io/rajkumaar23/cf-npm-ip-sync:main
+    image: ghcr.io/rajkumaar23/cloudflare-npm-ip-sync:main
     restart: always
     environment:
-      - NPM_HOST=
+      # protocol + hostname + (optionally, port) of nginx proxy manager
+      # eg: https://npm.domain.tld (or) http://192.168.4.33:8485
+      - NPM_HOST= 
+      # the email address for nginx proxy manager
       - NPM_EMAIL=
+      # the password to log in to nginx proxy manager
       - NPM_PASSWORD=
-      - NPM_ACCESS_LIST_ID=
-      - SYNC_INTERVAL="1h" # only valid Go time.Duration values are allowed
+      # the access list ID in nginx proxy manager
+      # you can usually find this under the three vertical dots,
+      # beside an access list on the dashboard
+      - NPM_ACCESS_LIST_ID= 
+      # only valid Go time.Duration values are allowed for the sync interval
+      # eg: 1h, 30m, 1h30m, 1h30m30s
+      - SYNC_INTERVAL="1h"

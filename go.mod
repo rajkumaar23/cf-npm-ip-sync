@@ -1,4 +1,4 @@
-module cf-npm-ip-sync
+module cloudflare-npm-ip-sync
 
 go 1.23.3
 
