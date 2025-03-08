@@ -6,15 +6,17 @@ import (
 	"reflect"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/joho/godotenv"
 )
 
 type Config struct {
-	NPMHost         string `env:"NPM_HOST"`
-	NPMEmail        string `env:"NPM_EMAIL"`
-	NPMPassword     string `env:"NPM_PASSWORD"`
-	NPMAccessListID int    `env:"NPM_ACCESS_LIST_ID"`
+	NPMHost         string        `env:"NPM_HOST"`
+	NPMEmail        string        `env:"NPM_EMAIL"`
+	NPMPassword     string        `env:"NPM_PASSWORD"`
+	NPMAccessListID int64         `env:"NPM_ACCESS_LIST_ID"`
+	SyncInterval    time.Duration `env:"SYNC_INTERVAL,optional"`
 }
 
 func NewConfig() (*Config, error) {
@@ -59,12 +61,20 @@ func (c *Config) loadVarsIntoConfig() error {
 		switch field.Kind() {
 		case reflect.String:
 			field.SetString(envValue)
-		case reflect.Int:
-			intValue, err := strconv.Atoi(envValue)
-			if err != nil {
-				return err
+		case reflect.Int64:
+			if field.Type() == reflect.TypeOf(time.Duration(0)) {
+				durationValue, err := time.ParseDuration(envValue)
+				if err != nil {
+					return err
+				}
+				field.SetInt(int64(durationValue))
+			} else {
+				intValue, err := strconv.Atoi(envValue)
+				if err != nil {
+					return err
+				}
+				field.SetInt(int64(intValue))
 			}
-			field.SetInt(int64(intValue))
 		}
 	}
 	return nil

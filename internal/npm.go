@@ -75,7 +75,7 @@ type AccessList struct {
 	Clients    []AccessListClient `json:"clients"`
 }
 
-func (c *NPMClient) getAccessList(id int) (*AccessList, error) {
+func (c *NPMClient) getAccessList(id int64) (*AccessList, error) {
 	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s/api/nginx/access-lists/%d?expand=items,clients", c.Host, id), nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create request: %w", err)
@@ -105,7 +105,7 @@ func (c *NPMClient) getAccessList(id int) (*AccessList, error) {
 	return &response, nil
 }
 
-func (c *NPMClient) UpdateAccessList(id int, ips []string) (int, error) {
+func (c *NPMClient) UpdateAccessList(id int64, ips []string) (int, error) {
 	accessList, err := c.getAccessList(id)
 	if err != nil {
 		return 0, err
