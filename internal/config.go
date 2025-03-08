@@ -5,7 +5,6 @@ import (
 	"os"
 	"reflect"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/joho/godotenv"
@@ -16,7 +15,7 @@ type Config struct {
 	NPMEmail        string        `env:"NPM_EMAIL"`
 	NPMPassword     string        `env:"NPM_PASSWORD"`
 	NPMAccessListID int64         `env:"NPM_ACCESS_LIST_ID"`
-	SyncInterval    time.Duration `env:"SYNC_INTERVAL,optional"`
+	SyncInterval    time.Duration `env:"SYNC_INTERVAL"`
 }
 
 func NewConfig() (*Config, error) {
@@ -48,14 +47,9 @@ func (c *Config) loadVarsIntoConfig() error {
 		if tag == "" {
 			continue
 		}
-
-		tagParts := strings.Split(tag, ",")
-		envKey := tagParts[0]
-		isOptional := len(tagParts) > 1 && tagParts[1] == "optional"
-
-		envValue := os.Getenv(envKey)
-		if envValue == "" && !isOptional {
-			return fmt.Errorf("environment variable %s is required but not set", envKey)
+		envValue := os.Getenv(tag)
+		if envValue == "" {
+			return fmt.Errorf("environment variable %s is required but not set", tag)
 		}
 
 		switch field.Kind() {
