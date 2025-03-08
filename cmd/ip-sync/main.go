@@ -22,10 +22,16 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to create npm client: %v", err)
 	}
-	err = nc.UpdateAccessList(c.NPMAccessListID, ips)
+	diff, err := nc.UpdateAccessList(c.NPMAccessListID, ips)
 	if err != nil {
 		log.Fatalf("failed to update access list: %v", err)
 	}
 
-	log.Printf("successfully updated access list")
+	if diff > 0 {
+		log.Printf("added %d IPs to access list", diff)
+	} else if diff < 0 {
+		log.Printf("removed %d IPs from access list", -diff)
+	} else {
+		log.Println("no changes to access list")
+	}
 }

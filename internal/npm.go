@@ -105,10 +105,10 @@ func (c *NPMClient) getAccessList(id int) (*AccessList, error) {
 	return &response, nil
 }
 
-func (c *NPMClient) UpdateAccessList(id int, ips []string) error {
+func (c *NPMClient) UpdateAccessList(id int, ips []string) (int, error) {
 	accessList, err := c.getAccessList(id)
 	if err != nil {
-		return err
+		return 0, err
 	}
 
 	var clients []AccessListClient
@@ -118,32 +118,34 @@ func (c *NPMClient) UpdateAccessList(id int, ips []string) error {
 			Directive: "allow",
 		})
 	}
+	
+	diff := len(clients) - len(accessList.Clients)
 
 	accessList.Clients = clients
 	jsonPayload, err := json.Marshal(accessList)
 	if err != nil {
-		return fmt.Errorf("failed to marshal payload: %w", err)
+		return 0, fmt.Errorf("failed to marshal payload: %w", err)
 	}
 
 	req, err := http.NewRequest(http.MethodPut, fmt.Sprintf("%s/api/nginx/access-lists/%d", c.Host, id), bytes.NewBuffer(jsonPayload))
 	if err != nil {
-		return fmt.Errorf("failed to create request: %w", err)
+		return 0, fmt.Errorf("failed to create request: %w", err)
 	}
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", c.Token))
 	req.Header.Set("Content-Type", "application/json")
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
-		return fmt.Errorf("failed to update access list: %w", err)
+		return 0, fmt.Errorf("failed to update access list: %w", err)
 	}
 	defer res.Body.Close()
 
 	if res.StatusCode != http.StatusOK {
 		body, err := io.ReadAll(res.Body)
 		if err != nil {
-			return fmt.Errorf("failed to read response body: %w", err)
+			return 0, fmt.Errorf("failed to read response body: %w", err)
 		}
 
-		return fmt.Errorf("unexpected status code: %d, response body: %s", res.StatusCode, string(body))
+		return 0, fmt.Errorf("unexpected status code: %d, response body: %s", res.StatusCode, string(body))
 	}
-	return nil
+	return diff, nil
 }
